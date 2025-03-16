@@ -47,20 +47,30 @@ jobs:
             --state-machine-arn arn:aws:states:us-east-1:713881815454:stateMachine:my-step-function \
             --definition file://step_function.json
 
-      - name: Install MySQL Connector and dependencies
-        run: |
-            mkdir -p package
-            pip install mysql-connector-python -t package/
+    #   - name: Install MySQL Connector and dependencies
+    #     run: |
+    #         mkdir -p package
+    #         pip install mysql-connector-python -t package/
 
-      - name: Package Lambda function
-        run: |
-            cd package
-            zip -r ../lambda_function.zip .
-            cd ..
-            zip -g lambda_function.zip lambda_function.py  # Add Lambda script
+    #   - name: Package Lambda function
+    #     run: |
+    #         cd package
+    #         zip -r ../lambda_function.zip .
+    #         cd ..
+    #         zip -g lambda_function.zip lambda_function.py  # Add Lambda script
 
-      - name: Upload to S3
-        run: aws s3 cp lambda_function.zip s3://lambda-deployment-bucket-ag/
+    #   - name: Upload to S3
+    #     run: aws s3 cp lambda_function.zip s3://lambda-deployment-bucket-ag/
+
+      - name: Build Lambda Layer
+        run: |
+          mkdir -p python
+          pip install mysql-connector-python -t python/
+          zip -r mysql-layer.zip python
+      
+      - name: Upload Layer to S3
+        run: aws s3 cp mysql-layer.zip s3://lambda-deployment-bucket-ag/
+      
     #   - name: Setup Terraform
     #     uses: hashicorp/setup-terraform@v1
 

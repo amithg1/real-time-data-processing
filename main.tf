@@ -59,6 +59,15 @@ resource "aws_lambda_function" "process_stream" {
   handler         = "lambda_function.lambda_handler"
   s3_bucket       = "lambda-deployment-bucket-ag"
   s3_key          = "lambda_function.zip"
+
+  layers = [aws_lambda_layer_version.mysql_layer.arn]
+}
+
+resource "aws_lambda_layer_version" "mysql_layer" {
+  layer_name          = "mysql-connector-layer"
+  compatible_runtimes = ["python3.9"]
+  s3_bucket           = "lambda-deployment-bucket-ag"
+  s3_key              = "mysql-layer.zip"
 }
 
 resource "aws_lambda_event_source_mapping" "kinesis_trigger" {

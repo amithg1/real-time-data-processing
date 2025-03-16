@@ -91,10 +91,35 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
+resource "aws_iam_policy" "lambda_kinesis_policy" {
+  name        = "LambdaKinesisPolicy"
+  description = "Policy for Lambda to read from Kinesis stream"
+  
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "kinesis:GetRecords",
+          "kinesis:GetShardIterator",
+          "kinesis:DescribeStream",
+          "kinesis:DescribeStreamSummary",
+          "kinesis:ListShards",
+          "kinesis:ListStreams"
+        ]
+        Resource = "arn:aws:kinesis:us-east-1:713881815454:stream/real-time-stream"
+      }
+    ]
+  })
+}
+
+
 resource "aws_iam_policy_attachment" "lambda_policy" {
   name       = "lambda_policy_attachment"
   roles      = [aws_iam_role.lambda_exec.name]
-  policy_arn = "arn:aws:iam::aws:policy/AWSLambdaBasicExecutionRole"
+  policy_arn = aws_iam_policy.lambda_kinesis_policy.arn
+
 }
 
 resource "aws_s3_bucket" "processed_data" {
@@ -175,7 +200,7 @@ resource "aws_s3_bucket_versioning" "versioning_2" {
 }
 
 resource "aws_iam_role" "glue_role" {
-  name = "AWSGlueServiceRole"
+  name = "AWSGlueServiceRole1"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -194,7 +219,7 @@ resource "aws_iam_role" "glue_role" {
 resource "aws_iam_policy_attachment" "glue_s3_access" {
   name       = "GlueS3Access"
   roles      = [aws_iam_role.glue_role.name]
-  policy_arn = "arn:aws:iam::aws:policy/AWSGlueServiceRole"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }
 
 resource "aws_iam_policy" "glue_ssm_access" {

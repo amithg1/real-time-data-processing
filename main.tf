@@ -136,6 +136,15 @@ resource "aws_s3_bucket_notification" "s3_event_trigger" {
   }
 }
 
+resource "aws_lambda_permission" "allow_s3_invoke" {
+  statement_id  = "AllowS3Invoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.invoke_step_function.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.processed_data.arn
+}
+
+
 # IAM Role for Lambda
 resource "aws_iam_role" "lambda_role" {
   name = "LambdaInvokeStepFunctionRole"
@@ -151,6 +160,30 @@ resource "aws_iam_role" "lambda_role" {
     }]
   })
 }
+
+resource "aws_iam_policy" "lambda_s3_policy" {
+  name        = "LambdaS3Policy"
+  description = "Policy for Lambda to access S3"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+        Resource = [
+          "arn:aws:s3:::processed-data-bucket-ag",
+          "arn:aws:s3:::processed-data-bucket-ag/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_attach" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.lambda_s3_policy.arn
+}
+
 
 # IAM Policy for Lambda to Invoke Step Functions
 resource "aws_iam_policy" "lambda_step_function_policy" {

@@ -17,8 +17,16 @@ conn = mysql.connector.connect(host=rds_host, user=db_user, password=db_pass, da
 
 def lambda_handler(event, context):
     for record in event["Records"]:
-        payload = json.loads(record["kinesis"]["data"])
+        try:
+            raw_data = base64.b64decode(record["kinesis"]["data"]).decode("utf-8")
+            payload = json.loads(raw_data)
+        except json.JSONDecodeError as e: 
+            print(f"JSON Decode Error: {e}")
+            print("Raw data received:", raw_data)
         
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
+            
         with conn.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO sensor_readings (id, temperature, humidity) VALUES (%s, %s, %s)",

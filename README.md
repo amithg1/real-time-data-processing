@@ -14,9 +14,9 @@ AWS Lambda:
 
 AWS S3 → Stores JSON sensor data files.
 
-Amazon EventBridge (S3 PutObject Event) → Triggers AWS Step Functions.
+Amazon EventBridge (S3 PutObject Event) → Triggers another AWS Lambda Function.
 
-AWS Step Functions → Orchestrates the workflow:
+This AWS Lambda Function → Invokes AWS Step Function, which in-turn triggers AWS Glue job.
 
 AWS Glue: Extracts, transforms, and loads (ETL) data into AWS Redshift.
 

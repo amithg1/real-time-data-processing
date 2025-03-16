@@ -107,6 +107,12 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_s3_full_access" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+
 resource "aws_iam_policy" "lambda_vpc_policy" {
   name        = "LambdaVPCPolicy"
   description = "Permissions for Lambda to interact with VPC"

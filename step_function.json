@@ -1,0 +1,14 @@
+{
+    "StartAt": "Trigger Glue Job",
+    "States": {
+      "Trigger Glue Job": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::glue:startJobRun",
+        "Parameters": {
+          "JobName": "sensor-glue-job"
+        },
+        "End": true
+      }
+    }
+  }
+  

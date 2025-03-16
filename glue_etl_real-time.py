@@ -40,7 +40,7 @@ df_transformed.write \
     .option("url", jdbc_url) \
     .option("dbtable", "sensor_analytics") \
     .option("user", "admin") \
-    .option("password", "password123") \
+    .option("password", "Password1") \
     .mode("append") \
     .save()
 

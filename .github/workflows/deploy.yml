@@ -1,0 +1,59 @@
+name: Deploy AWS Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Zip Lambda Function
+        run: zip -r lambda_function.zip lambda_function.py
+
+      - name: Upload ZIP to S3
+        run: aws s3 cp lambda_function.zip s3://lambda-deployment-bucket-ag/lambda_function.zip  
+
+      - name: Update Lambda Code
+        run: aws lambda update-function-code --function-name process-kinesis --s3-bucket lambda-deployment-bucket-ag --s3-key lambda_function.zip
+
+      - name: Zip Lambda Function
+        run: zip -r sfn_lambda_function.zip sfn_lambda_function.py
+
+      - name: Upload ZIP to S3
+        run: aws s3 cp sfn_lambda_function.zip s3://lambda-deployment-bucket-ag/sfn_lambda_function.zip  
+
+      - name: Update Lambda Code
+        run: aws lambda update-function-code --function-name InvokeStepFunctionLambda --s3-bucket lambda-deployment-bucket-ag --s3-key sfn_lambda_function.zip
+
+      - name: Upload Glue Script to S3
+        run: aws s3 cp glue_etl_real-time.py s3://glue-assets-ag/scripts/
+        
+      - name: Update Step Function Definition
+        run: |
+          aws stepfunctions update-state-machine \
+            --state-machine-arn arn:aws:states:us-east-1:713881815454:stateMachine:my-step-function \
+            --definition file://step_function.json
+    #   - name: Setup Terraform
+    #     uses: hashicorp/setup-terraform@v1
+
+    #   - name: Terraform Init
+    #     run: terraform init
+
+    #   - name: Terraform Plan
+    #     run: terraform plan
+
+    #   - name: Terraform Apply
+    #     run: terraform apply -auto-approve

@@ -8,7 +8,7 @@ from datetime import datetime
 s3_client = boto3.client("s3")
 s3_bucket_name = "processed-data-bucket-ag"
 
-rds_host = "realtime-mysql-db.xxxxxx.us-east-1.rds.amazonaws.com"
+rds_host = "mysql-database-1.cmf042mmsqvq.us-east-1.rds.amazonaws.com"
 db_user = "admin"
 db_pass = "password"
 db_name = "sensor_data"

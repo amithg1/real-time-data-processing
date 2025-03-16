@@ -60,6 +60,8 @@ resource "aws_lambda_function" "process_stream" {
   s3_bucket       = "lambda-deployment-bucket-ag"
   s3_key          = "lambda_function.zip"
 
+  timeout = 30
+
   vpc_config {
     subnet_ids         = ["subnet-049f38a339c9d1465", "subnet-0eb4e213d74eb9966"]
     security_group_ids = ["sg-0fbe7f34531b3bc40"]

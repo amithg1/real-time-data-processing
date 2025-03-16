@@ -1,6 +1,6 @@
 import json
 import boto3
-import pymysql
+import mysql.connector # type: ignore
 import base64
 from datetime import datetime
 
@@ -13,7 +13,7 @@ db_user = "admin"
 db_pass = "password"
 db_name = "sensor_data"
 
-conn = pymysql.connect(host=rds_host, user=db_user, password=db_pass, database=db_name)
+conn = mysql.connector.connect(host=rds_host, user=db_user, password=db_pass, database=db_name)
 
 def lambda_handler(event, context):
     for record in event["Records"]:

@@ -63,8 +63,8 @@ resource "aws_lambda_function" "process_stream" {
   timeout = 30
 
   vpc_config {
-    subnet_ids         = ["subnet-049f38a339c9d1465", "subnet-0eb4e213d74eb9966"]
-    security_group_ids = ["sg-0fbe7f34531b3bc40"]
+    subnet_ids         = ["subnet-0e2b76d29654ee212"]
+    security_group_ids = ["sg-0366d404eff703700", "sg-04d669d562d9a51b1"]
   }
 
   layers = [aws_lambda_layer_version.mysql_layer.arn]

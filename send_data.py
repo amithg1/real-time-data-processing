@@ -10,11 +10,17 @@ def send_data():
         "temperature": 25.3,
         "humidity": 70
     }
-    response = kinesis_client.put_record(
-        StreamName="real-time-stream",
-        Data=json.dumps(data),
-        PartitionKey="partitionKey"
-    )
-    print("Sent:", response)
+
+    try: 
+
+        response = kinesis_client.put_record(
+            StreamName="real-time-stream",
+            Data=json.dumps(data),
+            PartitionKey="partitionKey"
+        )
+        print("Sent:", response)
+
+    except Exception as e:
+        print("Error:", e)
 
 send_data()
